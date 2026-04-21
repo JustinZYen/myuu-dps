@@ -48,7 +48,6 @@ class Optimizer:
             return []
         memo_key = repr((turns_remaining, boss, tuple(team), active))
         if memo_key in self.memo:
-            print("memo hit")
             actions, damage = self.memo[memo_key]
             boss.damage = damage
             return actions
