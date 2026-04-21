@@ -60,6 +60,13 @@ class Pokemon:
             return self._stats[stat] * multiplier # type: ignore
         else:
             raise ValueError(f"Stat {stat} not recognized")
+        
+    def __repr__(self):
+        return str((str(self), self.stat_boosts, self.other_boosts))
+    
+        
+    def __str__(self):
+        return type(self).__name__
 
 class Boss(Pokemon):
     def __init__(self):
@@ -73,7 +80,7 @@ class Boss(Pokemon):
             "spe" : 1.0,
         }
         self.damage = 0
-        self.types = set("water")
+        self.types = set(["water"])
 
     def take_damage(self, damage, def_type, damage_type):
         neutral_damage = damage / self.get_stat(def_type)
@@ -86,7 +93,10 @@ class Boss(Pokemon):
         else:
             raise ValueError(f"Damage type {damage_type} not recognized")
         self.damage += type_damage
-    
+        
+    def __repr__(self):
+        return str((str(self), self.stat_boosts, self.other_boosts, self.types))
+
 
 class TeamPokemon(Pokemon):
     def __init__(self, boss):
@@ -136,9 +146,6 @@ class Shuckle(TeamPokemon):
         else: # Dead and must switch
             return (True, False)
         
-    def __str__(self):
-        return "Shuckle"
-        
 class Eevee(TeamPokemon):
     def __init__(self, boss):
         super().__init__(boss)
@@ -166,10 +173,7 @@ class Eevee(TeamPokemon):
             return (False, False)
         else:
             raise ValueError
-    
-    def __str__(self):
-        return "Eevee"
-        
+
 class Pangoro(TeamPokemon):
     def __init__(self, boss):
         super().__init__(boss)
@@ -202,9 +206,6 @@ class Pangoro(TeamPokemon):
         else:
             raise ValueError
         
-    def __str__(self):
-        return "Pangoro"
-
 class Smeargle(TeamPokemon):
     def __init__(self, boss):
         super().__init__(boss)
@@ -228,5 +229,3 @@ class Smeargle(TeamPokemon):
         else:
             raise ValueError
     
-    def __str__(self):
-        return "Smeargle"

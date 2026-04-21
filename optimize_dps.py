@@ -5,7 +5,8 @@ def automatic_optimize():
     boss = Boss()
     team = [Shuckle(Boss), Eevee(Boss), Pangoro(Boss), Smeargle(Boss)]
     opt = Optimizer()
-    best = opt.maximize_swap(5, boss, team, use_boosts=False)
+    best = opt.maximize_swap(2, boss, team, use_boosts=False)
+    # print(opt.memo)
     print("---ACTION ORDER---")
     print(" | ".join(reversed(best)))
     print("---TOTAL DAMAGE---")
