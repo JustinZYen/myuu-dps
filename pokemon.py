@@ -1,5 +1,6 @@
 PERFECT_ODDS = False
 from move_result import *
+import utils
 class Pokemon:
     def __init__(self):
         self._stats = {
@@ -82,14 +83,7 @@ class Boss(Pokemon):
 
     def take_damage(self, damage, def_type, damage_type):
         neutral_damage = damage / self.get_stat(def_type)
-        type_damage = neutral_damage
-        if damage_type == "dark" or damage_type == "ghost":
-            if "ghost" in self.types:
-                type_damage *= 2
-            if "psychic" in self.types:
-                type_damage *= 2
-        else:
-            raise ValueError(f"Damage type {damage_type} not recognized")
+        type_damage = neutral_damage * utils.get_type_multiplier(damage_type, self.types)
         self._damage += type_damage
         return type_damage
         
