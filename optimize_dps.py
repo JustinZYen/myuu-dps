@@ -4,7 +4,7 @@ import utils
 
 def automatic_optimize():
     boss = Boss()
-    team = [Shuckle(boss), Eevee(boss), Pangoro(boss), Smeargle(boss), Scolipede(boss)]
+    team = [Shuckle(boss), Eevee(boss), Pangoro(boss), Smeargle(boss), Scolipede(boss), Shieldon(boss)]
     opt = Optimizer()
     best_actions, best_damage = opt.maximize_swap(20, boss, team, use_boosts=False)
     print("---ACTION ORDER---")
