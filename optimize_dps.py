@@ -1,16 +1,14 @@
 from pokemon import *
 from optimizer import Optimizer
 import utils
+import itertools
 
 def automatic_optimize(team):
     boss = Boss()
     opt = Optimizer()
     team_pokemon = [constructor(boss) for constructor in team]
-    best_actions, best_damage = opt.maximize_swap(20, boss, team_pokemon, use_boosts=False)
-    print("---ACTION ORDER---")
-    print(" | ".join(reversed(best_actions)))
-    print("---TOTAL DAMAGE---")
-    print(best_damage)
+    result = opt.maximize_swap(20, boss, team_pokemon, use_boosts=False)
+    return result
 
 def manual_optimize():
     boss = Boss()
@@ -46,7 +44,18 @@ def manual_optimize():
     
 
 if __name__ == "__main__":
-    team = [Shuckle, Annihilape, Smeargle, Scolipede, Shieldon, Carbink]
-    automatic_optimize(team)
-    # manual_optimize()
-    
+    setup_choices = [Shuckle, Eevee, Smeargle, Scolipede, Shieldon, Carbink]
+    damage_choices = [Pangoro, Annihilape]
+    results = []
+    for setup in itertools.combinations(setup_choices, 5):
+        for damage in itertools.combinations(damage_choices, 1):
+            team = setup+damage
+            print("Team:", team)
+            result = automatic_optimize(team)
+            results.append(result)
+    results.sort(key=lambda result: result[1], reverse=True)
+    for i in range(3):
+        print("---ACTION ORDER---")
+        print(" | ".join(reversed(results[i][0])))
+        print("---TOTAL DAMAGE---")
+        print(results[i][1])
