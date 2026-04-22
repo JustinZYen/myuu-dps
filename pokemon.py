@@ -1,20 +1,6 @@
 PERFECT_ODDS = False
 
 class Pokemon:
-    STAT_BOOSTS = {
-        "atk" : 0,
-        "def" : 0,
-        "spa" : 0,
-        "spd" : 0,
-        "spe" : 0,
-        "acc" : 0,
-        "eva" : 0,
-    } # boost stages, not the actual multipliers
-
-    OTHER_BOOSTS = {
-        "focus energy": False
-    }
-
     def __init__(self):
         self._stats = {
             "hp"  : 1.0,
@@ -24,8 +10,18 @@ class Pokemon:
             "spd" : 1.0,
             "spe" : 1.0,
         }
-        self.stat_boosts = Pokemon.STAT_BOOSTS
-        self.other_boosts = Pokemon.OTHER_BOOSTS
+        self.stat_boosts = {
+            "atk" : 0,
+            "def" : 0,
+            "spa" : 0,
+            "spd" : 0,
+            "spe" : 0,
+            "acc" : 0,
+            "eva" : 0,
+        } # boost stages, not the actual multipliers
+        self.other_boosts = {
+            "focus energy": False
+        }
     
     def get_move_choices(self)->list[str]:
         raise NotImplementedError
@@ -47,13 +43,13 @@ class Pokemon:
         if stat == "hp":
             return self._stats["hp"] # type: ignore
         elif stat in ("atk", "def", "spa", "spd", "spe"):
-            if stage := self.stat_boosts[stat] > 0:
+            if (stage := self.stat_boosts[stat]) > 0:
                 multiplier = (stage+2)/2
             else:
                 multiplier = 2/(-stage+2)
             return self._stats[stat] * multiplier # type: ignore
         elif stat in ("acc", "eva"):
-            if stage := self.stat_boosts[stat] > 0:
+            if (stage := self.stat_boosts[stat]) > 0:
                 multiplier = (stage+3)/3
             else:
                 multiplier = 3/(-stage+3)
@@ -152,7 +148,9 @@ class Eevee(TeamPokemon):
         self.can_z_move = True
 
     def get_move_choices(self)->list[str]:
-        moves = ["double team", "focus energy", "baton pass"]
+        moves = ["double team", "baton pass"]
+        if self.other_boosts["focus energy"] == False:
+            moves.append("focus energy")
         if self.can_z_move:
             moves.append("extreme evoboost")
         return moves

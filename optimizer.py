@@ -47,10 +47,10 @@ class Optimizer:
         if turns_remaining <= 0:
             return []
         memo_key = repr((turns_remaining, boss, tuple(team), active))
-        if memo_key in self.memo:
-            actions, damage = self.memo[memo_key]
-            boss.damage = damage
-            return actions
+        # if memo_key in self.memo:
+        #     actions, damage = self.memo[memo_key]
+        #     boss.damage = damage
+        #     return actions
         turns_remaining-=1
         best_actions = []
         best_damage = -1
