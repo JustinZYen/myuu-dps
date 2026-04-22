@@ -1,5 +1,5 @@
 PERFECT_ODDS = False
-
+from move_result import *
 class Pokemon:
     def __init__(self):
         self._stats = {
@@ -26,7 +26,7 @@ class Pokemon:
     def get_move_choices(self)->list[str]:
         raise NotImplementedError
     
-    def make_move(self, move)->tuple[bool, bool]:
+    def make_move(self, move)->DefaultResult:
         """
         Returns a tuple of (swap, baton_pass) saying whether a swap should occur and whether stat boosts are passed if so
         """
@@ -75,7 +75,7 @@ class Boss(Pokemon):
             "spd" : 600,
             "spe" : 1.0,
         }
-        self.damage = 0
+        self._damage = 0
         self.types = set(["water"])
 
     def take_damage(self, damage, def_type, damage_type):
@@ -88,7 +88,8 @@ class Boss(Pokemon):
                 type_damage *= 2
         else:
             raise ValueError(f"Damage type {damage_type} not recognized")
-        self.damage += type_damage
+        self._damage += type_damage
+        return type_damage
         
     def __repr__(self):
         return str((str(self), self.stat_boosts, self.other_boosts, self.types))
@@ -138,9 +139,9 @@ class Shuckle(TeamPokemon):
         else:
             raise ValueError
         if self._state == 1:
-            return (False, False)
+            return DefaultResult()
         else: # Dead and must switch
-            return (True, False)
+            return DeadResult()
         
 class Eevee(TeamPokemon):
     def __init__(self, boss):
@@ -158,17 +159,17 @@ class Eevee(TeamPokemon):
     def make_move(self, move):
         if move == "double team":
             self.change_stat("eva", 2)
-            return (False, False)
+            return DefaultResult()
         elif move == "focus energy":
             self.other_boosts["focus energy"] = True
-            return (False, False) # Swapping without baton pass
+            return DefaultResult()
         elif move == "baton pass":
-            return (True, True)
+            return BatonPassResult()
         elif move == "extreme evoboost":
             for stat in ("atk", "def", "spa", "spd", "spe"):
                 self.change_stat(stat, 2)
             self.can_z_move = False
-            return (False, False)
+            return DefaultResult()
         else:
             raise ValueError
 
@@ -199,8 +200,8 @@ class Pangoro(TeamPokemon):
                     damage *= 1.5
                 else:
                     damage *= 1.25
-            self.boss.take_damage(damage, "def", "dark")
-            return (False, False)
+            hp_damage = self.boss.take_damage(damage, "def", "dark")
+            return DamageResult(hp_damage)
         else:
             raise ValueError
         
@@ -215,15 +216,15 @@ class Smeargle(TeamPokemon):
     def make_move(self, move):
         if move == "magic powder":
             self.boss.types = set(["psychic"])
-            return (False, False)
+            return DefaultResult()
         elif move == "trick or treat":
             self.boss.types.add("ghost")
-            return (False, False) # Swapping without baton pass
+            return DefaultResult()
         elif move == "baton pass":
-            return (True, True)
+            return BatonPassResult()
         elif move == "belly drum":
             self.change_stat("atk", 6)
-            return (False, False)
+            return DefaultResult()
         else:
             raise ValueError
     

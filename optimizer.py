@@ -17,13 +17,13 @@ class Optimizer:
         if active is not None:
             active.boss = boss
 
-    def maximize_swap(self, turns_remaining:int, boss:Boss, team:list[TeamPokemon], use_boosts, old_pkmn:None|TeamPokemon = None)->list[str]:
+    def maximize_swap(self, turns_remaining:int, boss:Boss, team:list[TeamPokemon], use_boosts, old_pkmn:None|TeamPokemon = None)->tuple[list[str], float]:
         """
         Make the swap that maximizes final damage to boss
         Returns actions in reverse order to take advantage of append performance
         """
         if turns_remaining <= 0 or len(team) == 0:
-            return []
+            return ([], 0)
         best_actions = []
         best_damage = -1
         for i, _ in enumerate(team):
@@ -35,17 +35,16 @@ class Optimizer:
             if use_boosts:
                 assert(old_pkmn is not None)
                 utils.baton_pass(old_pkmn, swap_target)
-            actions = self.maximize_move(turns_remaining, new_boss, new_team, swap_target)
-            if new_boss.damage > best_damage:
+            actions, damage = self.maximize_move(turns_remaining, new_boss, new_team, swap_target)
+            if damage > best_damage:
                 best_actions = actions+[f"Swap to {swap_target}"]
-                best_damage = new_boss.damage
-        boss.damage = best_damage
-        return best_actions
+                best_damage = damage
+        return (best_actions, best_damage)
 
 
-    def maximize_move(self, turns_remaining:int, boss:Boss, team:list[TeamPokemon], active:TeamPokemon)->list[str]:
+    def maximize_move(self, turns_remaining:int, boss:Boss, team:list[TeamPokemon], active:TeamPokemon)->tuple[list[str], float]:
         if turns_remaining <= 0:
-            return []
+            return ([], 0)
         memo_key = repr((turns_remaining, boss, tuple(team), active))
         # if memo_key in self.memo:
         #     actions, damage = self.memo[memo_key]
@@ -60,15 +59,14 @@ class Optimizer:
             new_active = copy.deepcopy(active)
             self.update_boss(new_boss, new_team, new_active)
 
-            swap, baton_pass = new_active.make_move(move)
-            if swap:
-                actions = self.maximize_swap(
-                    turns_remaining, new_boss, new_team, use_boosts=baton_pass, old_pkmn=new_active)
+            move_result = new_active.make_move(move)
+            if move_result.swap:
+                actions, damage = self.maximize_swap(
+                    turns_remaining, new_boss, new_team, use_boosts=move_result.baton_pass, old_pkmn=new_active)
             else:
-                actions = self.maximize_move(turns_remaining, new_boss, new_team, new_active)
-            if new_boss.damage > best_damage:
+                actions, damage = self.maximize_move(turns_remaining, new_boss, new_team, new_active)
+            if move_result.damage + damage > best_damage:
                 best_actions = actions+[f"{new_active} used {move}"]
-                best_damage = new_boss.damage
-        boss.damage = best_damage
+                best_damage = move_result.damage + damage
         self.memo[memo_key] = (best_actions, best_damage)
-        return best_actions
+        return (best_actions, best_damage)
