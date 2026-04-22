@@ -58,8 +58,10 @@ class Pokemon:
             raise ValueError(f"Stat {stat} not recognized")
         
     def __repr__(self):
-        return str((str(self), self.stat_boosts, self.other_boosts))
+        return str(self.get_relevant_fields())
     
+    def get_relevant_fields(self):
+        return [str(self), self.stat_boosts, self.other_boosts]
         
     def __str__(self):
         return type(self).__name__
@@ -91,8 +93,8 @@ class Boss(Pokemon):
         self._damage += type_damage
         return type_damage
         
-    def __repr__(self):
-        return str((str(self), self.stat_boosts, self.other_boosts, self.types))
+    def get_relevant_fields(self):
+        return super().get_relevant_fields() + [self.types]
 
 
 class TeamPokemon(Pokemon):
@@ -143,8 +145,8 @@ class Shuckle(TeamPokemon):
         else: # Dead and must switch
             return DeadResult()
     
-    def __repr__(self):
-        return super().__repr__() + str({"_state":self._state})
+    def get_relevant_fields(self):
+        return super().get_relevant_fields() + [{"_state":self._state}]
         
 class Eevee(TeamPokemon):
     def __init__(self, boss):
@@ -175,9 +177,9 @@ class Eevee(TeamPokemon):
             return DefaultResult()
         else:
             raise ValueError
-        
-    def __repr__(self):
-        return super().__repr__() + str({"can_z_move":self.can_z_move})
+    
+    def get_relevant_fields(self):
+        return super().get_relevant_fields() + [{"can_z_move":self.can_z_move}]
 
 class Pangoro(TeamPokemon):
     def __init__(self, boss):
@@ -232,5 +234,4 @@ class Smeargle(TeamPokemon):
             self.change_stat("atk", 6)
             return DefaultResult()
         else:
-            raise ValueError
-    
+            raise ValueError    
