@@ -142,6 +142,9 @@ class Shuckle(TeamPokemon):
             return DefaultResult()
         else: # Dead and must switch
             return DeadResult()
+    
+    def __repr__(self):
+        return super().__repr__() + str({"_state":self._state})
         
 class Eevee(TeamPokemon):
     def __init__(self, boss):
@@ -172,6 +175,9 @@ class Eevee(TeamPokemon):
             return DefaultResult()
         else:
             raise ValueError
+        
+    def __repr__(self):
+        return super().__repr__() + str({"can_z_move":self.can_z_move})
 
 class Pangoro(TeamPokemon):
     def __init__(self, boss):
