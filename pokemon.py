@@ -234,4 +234,23 @@ class Smeargle(TeamPokemon):
             self.change_stat("atk", 6)
             return DefaultResult()
         else:
-            raise ValueError    
+            raise ValueError
+
+class Scolipede(TeamPokemon):
+    def __init__(self, boss):
+        super().__init__(boss)
+
+    def get_move_choices(self)->list[str]:
+        moves = ["screech", "baton pass"]
+        return moves
+    
+    def make_move(self, move):
+        if move == "screech":
+            self.boss.change_stat("def", -2)
+            # speed boost
+            self.change_stat("spe", 1)
+            return DefaultResult()
+        elif move == "baton pass":
+            return BatonPassResult()
+        else:
+            raise ValueError
