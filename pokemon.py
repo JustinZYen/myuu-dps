@@ -279,7 +279,7 @@ class Shieldon(TeamPokemon):
     
     def make_move(self, move):
         if self._state > 1:
-            raise ValueError(f"Shuckle in invalid state {self._state}")
+            raise ValueError(f"{str(self)} in invalid state {self._state}")
         if move == "screech":
             self.boss.change_stat("def", -2)
             self._state += 1
@@ -300,3 +300,50 @@ class Shieldon(TeamPokemon):
     
     def get_relevant_fields(self):
         return super().get_relevant_fields() + [{"_state":self._state}]
+    
+class Carbink(TeamPokemon):
+    def __init__(self, boss):
+        super().__init__(boss)
+        self.turn = 1
+        self._stats = {
+            "hp"  : 11,
+            "atk" : 5,
+            "def" : 9,
+            "spa" : 5,
+            "spd" : 9,
+            "spe" : 5,
+        }
+        self._state = 0 # 0 = full hp, 1 = after sturdy procs, 2 = dead
+
+    def get_move_choices(self)->list[str]:
+        if self._state == 0:
+            return ["charm"]
+        elif self._state == 1:
+            return ["guard split"]
+        else:
+            raise ValueError # shuckle should be dead at this point
+    
+    def make_move(self, move):
+        if self._state > 1:
+            raise ValueError(f"{str(self)} in invalid state {self._state}")
+        if move == "charm":
+            self.boss.change_stat("atk", -2)
+            self._state += 1
+        elif move == "guard split":
+            new_def = (self.boss._stats["def"] + self._stats["def"]) / 2
+            self.boss._stats["def"] = new_def
+            self._stats["def"] = new_def
+            new_spd = (self.boss._stats["spd"] + self._stats["spd"]) / 2
+            self.boss._stats["spd"] = new_spd
+            self._stats["spd"] = new_spd
+            self._state += 1
+        else:
+            raise ValueError
+        if self._state == 1:
+            return DefaultResult()
+        else: # Dead and must switch
+            return DeadResult()
+    
+    def get_relevant_fields(self):
+        return super().get_relevant_fields() + [{"_state":self._state}]
+    

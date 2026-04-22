@@ -2,11 +2,11 @@ from pokemon import *
 from optimizer import Optimizer
 import utils
 
-def automatic_optimize():
+def automatic_optimize(team):
     boss = Boss()
-    team = [Shuckle(boss), Eevee(boss), Pangoro(boss), Smeargle(boss), Scolipede(boss), Shieldon(boss)]
     opt = Optimizer()
-    best_actions, best_damage = opt.maximize_swap(20, boss, team, use_boosts=False)
+    team_pokemon = [constructor(boss) for constructor in team]
+    best_actions, best_damage = opt.maximize_swap(20, boss, team_pokemon, use_boosts=False)
     print("---ACTION ORDER---")
     print(" | ".join(reversed(best_actions)))
     print("---TOTAL DAMAGE---")
@@ -46,6 +46,7 @@ def manual_optimize():
     
 
 if __name__ == "__main__":
-    automatic_optimize()
-    manual_optimize()
+    team = [Shuckle, Pangoro, Smeargle, Scolipede, Shieldon, Carbink]
+    automatic_optimize(team)
+    # manual_optimize()
     
