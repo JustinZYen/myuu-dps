@@ -83,7 +83,7 @@ class Boss(Pokemon):
     def take_damage(self, damage, def_type, damage_type):
         neutral_damage = damage / self.get_stat(def_type)
         type_damage = neutral_damage
-        if damage_type == "dark":
+        if damage_type == "dark" or damage_type == "ghost":
             if "ghost" in self.types:
                 type_damage *= 2
             if "psychic" in self.types:
@@ -186,7 +186,7 @@ class Pangoro(TeamPokemon):
         super().__init__(boss)
         self._stats = {
             "hp"  : 11,
-            "atk" : 300,
+            "atk" : 381,
             "def" : 9,
             "spa" : 5,
             "spd" : 9,
@@ -347,3 +347,36 @@ class Carbink(TeamPokemon):
     def get_relevant_fields(self):
         return super().get_relevant_fields() + [{"_state":self._state}]
     
+class Annihilape(TeamPokemon):
+    def __init__(self, boss):
+        super().__init__(boss)
+        self._stats = {
+            "hp"  : 11,
+            "atk" : 361,
+            "def" : 9,
+            "spa" : 5,
+            "spd" : 9,
+            "spe" : 5,
+        }
+        self.hits_taken = 0
+
+    def get_move_choices(self)->list[str]:
+        return ["rage fist"]
+    
+    def make_move(self, move):
+        self.hits_taken += 1
+        if move == "rage fist":
+            base_damage = 50 + min(6, self.hits_taken) * 50
+            damage = base_damage * self.get_stat("atk")
+            if self.other_boosts["focus energy"]:
+                if PERFECT_ODDS:
+                    damage *= 1.5
+                else:
+                    damage *= 1.25
+            hp_damage = self.boss.take_damage(damage, "def", "ghost")
+            return DamageResult(hp_damage)
+        else:
+            raise ValueError
+        
+    def get_relevant_fields(self):
+        return super().get_relevant_fields() + [{"hits_taken":self.hits_taken}]

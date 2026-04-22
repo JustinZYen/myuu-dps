@@ -46,7 +46,7 @@ def manual_optimize():
     
 
 if __name__ == "__main__":
-    team = [Shuckle, Pangoro, Smeargle, Scolipede, Shieldon, Carbink]
+    team = [Shuckle, Annihilape, Smeargle, Scolipede, Shieldon, Carbink]
     automatic_optimize(team)
     # manual_optimize()
     
