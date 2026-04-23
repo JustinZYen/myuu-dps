@@ -256,7 +256,7 @@ class Shieldon(TeamPokemon):
         self._stats = {
             "hp"  : 11,
             "atk" : 5,
-            "def" : 9,
+            "def" : 6,
             "spa" : 5,
             "spd" : 9,
             "spe" : 5,
@@ -302,7 +302,7 @@ class Carbink(TeamPokemon):
         self._stats = {
             "hp"  : 11,
             "atk" : 5,
-            "def" : 9,
+            "def" : 7,
             "spa" : 5,
             "spd" : 9,
             "spe" : 5,
