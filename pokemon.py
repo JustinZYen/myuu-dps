@@ -355,7 +355,7 @@ class Annihilape(TeamPokemon):
         self.hits_taken = 0
 
     def get_move_choices(self)->list[str]:
-        return ["rage fist"]
+        return ["rage fist", "screech"]
     
     def make_move(self, move):
         self.hits_taken += 1
@@ -369,6 +369,9 @@ class Annihilape(TeamPokemon):
                     damage *= 1.25
             hp_damage = self.boss.take_damage(damage, "def", "ghost")
             return DamageResult(hp_damage)
+        elif move == "screech":
+            self.boss.change_stat("def", -2)
+            return DefaultResult()
         else:
             raise ValueError
         
