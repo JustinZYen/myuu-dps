@@ -3,6 +3,7 @@ class DefaultResult:
         self.damage = 0
         self.swap = False
         self.baton_pass = False
+        self.undo_info = {}
 
 class DeadResult(DefaultResult):
     def __init__(self):

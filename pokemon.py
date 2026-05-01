@@ -29,10 +29,17 @@ class Pokemon:
     
     def make_move(self, move)->DefaultResult:
         """
-        Returns a tuple of (swap, baton_pass) saying whether a swap should occur and whether stat boosts are passed if so
+        Returns a Result object containing information about the move done
         """
         raise NotImplementedError
     
+    def undo_move(self, move, undo_info):
+        """
+        Undoes a move. undo_info may vary in its type as what must be undone
+        will vary from pokemon to pokemon and move to move.
+        """
+        raise NotImplementedError
+
     def change_stat(self, stat, stages:int):
         if stages > 0:
             self.stat_boosts[stat] = min(self.stat_boosts[stat]+stages, 6)
