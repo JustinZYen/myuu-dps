@@ -128,24 +128,47 @@ class Shuckle(TeamPokemon):
     def make_move(self, move):
         if self._state > 1:
             raise ValueError(f"Shuckle in invalid state {self._state}")
+        
+        old_state = self._state
+        self._state += 1
+        if self._state == 1:
+            res = DefaultResult()
+        else: # Dead and must switch
+            res = DeadResult()
+        res.undo_info["state"] = old_state
+
         if move == "power split":
             #nothing
-            self._state += 1
+            pass
         elif move == "guard split":
+            res.undo_info["self_def"] = self._stats["def"]
+            res.undo_info["self_spd"] = self._stats["spd"]
+            res.undo_info["boss_def"] = self.boss._stats["def"]
+            res.undo_info["boss_spd"] = self.boss._stats["spd"]
+
             new_def = (self.boss._stats["def"] + self._stats["def"]) / 2
             self.boss._stats["def"] = new_def
             self._stats["def"] = new_def
             new_spd = (self.boss._stats["spd"] + self._stats["spd"]) / 2
             self.boss._stats["spd"] = new_spd
             self._stats["spd"] = new_spd
-            self._state += 1
         else:
             raise ValueError
-        if self._state == 1:
-            return DefaultResult()
-        else: # Dead and must switch
-            return DeadResult()
+
+        return res
     
+    def undo_move(self, move, undo_info):
+        if move == "power split":
+            self._state = undo_info["state"]
+        elif move == "guard split":
+            self._state = undo_info["state"]
+            self._stats["def"] = undo_info["self_def"]
+            self._stats["spd"] = undo_info["self_spd"]
+            self.boss._stats["def"] = undo_info["boss_def"]
+            self.boss._stats["spd"] = undo_info["boss_spd"]
+        else:
+            raise ValueError
+
     def get_relevant_fields(self):
         return super().get_relevant_fields() + [{"_state":self._state}]
         
