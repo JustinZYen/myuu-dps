@@ -464,7 +464,7 @@ class Carbink(TeamPokemon):
         return res
     
     def undo_move(self, move, undo_info):
-        if move == "screech":
+        if move == "charm":
             self._state = undo_info["state"]
             self.boss.stat_boosts["atk"] = undo_info["atk"]
         elif move == "guard split":
@@ -474,7 +474,7 @@ class Carbink(TeamPokemon):
             self.boss._stats["def"] = undo_info["boss_def"]
             self.boss._stats["spd"] = undo_info["boss_spd"]
         else:
-            raise ValueError
+            raise ValueError(f"Tried undoing move {move} with undo info {undo_info}")
         
     def get_relevant_fields(self):
         return super().get_relevant_fields() + [{"_state":self._state}]
