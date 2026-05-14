@@ -274,18 +274,37 @@ class Smeargle(TeamPokemon):
     
     def make_move(self, move):
         if move == "magic powder":
+            res = DefaultResult()
+            res.undo_info["types"] = self.boss.types
             self.boss.types = set(["psychic"])
-            return DefaultResult()
+            return res
         elif move == "trick or treat":
+            res = DefaultResult()
+            res.undo_info["types"] = self.boss.types
             self.boss.types.add("ghost")
-            return DefaultResult()
+            return res
         elif move == "baton pass":
             return BatonPassResult()
         elif move == "belly drum":
+            res = DefaultResult()
+            res.undo_info["atk"] = self.stat_boosts["atk"]
             self.change_stat("atk", 6)
-            return DefaultResult()
+            return res
         else:
             raise ValueError
+    
+    def undo_move(self, move, undo_info):
+        if move == "magic powder":
+            self.boss.types = undo_info["types"]
+        elif move == "trick or treat":
+            self.boss.types = undo_info["types"]
+        elif move == "baton pass":
+            pass # nothing to do
+        elif move == "belly drum":
+            self.stat_boosts["atk"] = undo_info["atk"]
+        else:
+            raise ValueError
+        
 
 class Scolipede(TeamPokemon):
     def __init__(self, boss):
