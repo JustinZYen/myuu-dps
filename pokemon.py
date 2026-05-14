@@ -316,15 +316,28 @@ class Scolipede(TeamPokemon):
     
     def make_move(self, move):
         if move == "screech":
+            res = DefaultResult()
+            res.undo_info["boss_def"] = self.boss.stat_boosts["def"]
+            res.undo_info["self_spe"] = self.stat_boosts["spe"]
+
             self.boss.change_stat("def", -2)
             # speed boost
             self.change_stat("spe", 1)
-            return DefaultResult()
+            return res
         elif move == "baton pass":
             return BatonPassResult()
         else:
             raise ValueError
         
+    def undo_move(self, move, undo_info):
+        if move == "screech":
+            self.boss.stat_boosts["def"] = undo_info["boss_def"]
+            self.stat_boosts["spe"] = undo_info["self_spe"]
+        elif move == "baton pass":
+            pass
+        else:
+            raise ValueError
+    
 class Shieldon(TeamPokemon):
     def __init__(self, boss):
         super().__init__(boss)
