@@ -257,6 +257,12 @@ class Pangoro(TeamPokemon):
             return DamageResult(hp_damage)
         else:
             raise ValueError
+    
+    def undo_move(self, move, undo_info):
+        if move == "power trip":
+            pass # nothing to undo
+        else:
+            raise ValueError
         
 class Smeargle(TeamPokemon):
     def __init__(self, boss):
