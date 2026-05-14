@@ -187,21 +187,42 @@ class Eevee(TeamPokemon):
     
     def make_move(self, move):
         if move == "double team":
+            res =  DefaultResult()
+            res.undo_info["eva"] = self.stat_boosts["eva"]
             self.change_stat("eva", 2)
-            return DefaultResult()
+            return res
         elif move == "focus energy":
+            res =  DefaultResult()
+            res.undo_info["focus energy"] = self.other_boosts["focus energy"]
             self.other_boosts["focus energy"] = True
-            return DefaultResult()
+            return res
         elif move == "baton pass":
             return BatonPassResult()
         elif move == "extreme evoboost":
+            res = DefaultResult()
             for stat in ("atk", "def", "spa", "spd", "spe"):
+                res.undo_info[stat] = self.stat_boosts[stat]
                 self.change_stat(stat, 2)
+            res.undo_info["z move"] = self.can_z_move
             self.can_z_move = False
-            return DefaultResult()
+            return res
         else:
             raise ValueError
     
+    def undo_move(self, move, undo_info):
+        if move == "double team":
+            self.stat_boosts["eva"] = undo_info["eva"]
+        elif move == "focus energy":
+            self.other_boosts["focus energy"] = undo_info["focus energy"]
+        elif move == "baton pass":
+            pass # nothing to undo
+        elif move == "extreme evoboost":
+            for stat in ("atk", "def", "spa", "spd", "spe"):
+                self.stat_boosts[stat] = undo_info[stat]
+            self.can_z_move = undo_info["z move"]
+        else:
+            raise ValueError
+
     def get_relevant_fields(self):
         return super().get_relevant_fields() + [{"can_z_move":self.can_z_move}]
 
