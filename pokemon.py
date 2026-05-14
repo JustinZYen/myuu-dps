@@ -1,6 +1,8 @@
 PERFECT_ODDS = False
 from move_result import *
 import utils
+import copy
+
 class Pokemon:
     def __init__(self):
         self._stats = {
@@ -275,12 +277,12 @@ class Smeargle(TeamPokemon):
     def make_move(self, move):
         if move == "magic powder":
             res = DefaultResult()
-            res.undo_info["types"] = self.boss.types
+            res.undo_info["types"] = copy.copy(self.boss.types)
             self.boss.types = set(["psychic"])
             return res
         elif move == "trick or treat":
             res = DefaultResult()
-            res.undo_info["types"] = self.boss.types
+            res.undo_info["types"] = copy.copy(self.boss.types)
             self.boss.types.add("ghost")
             return res
         elif move == "baton pass":
@@ -390,10 +392,8 @@ class Shieldon(TeamPokemon):
             self._state += 1
         else:
             raise ValueError
-        if self._state == 1:
-            return DefaultResult()
-        else: # Dead and must switch
-            return DeadResult()
+        
+        return res
         
     def undo_move(self, move, undo_info):
         if move == "screech":
@@ -464,10 +464,8 @@ class Carbink(TeamPokemon):
             self._state += 1
         else:
             raise ValueError
-        if self._state == 1:
-            return DefaultResult()
-        else: # Dead and must switch
-            return DeadResult()
+        
+        return res
     
     def undo_move(self, move, undo_info):
         if move == "screech":

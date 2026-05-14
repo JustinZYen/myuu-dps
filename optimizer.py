@@ -52,19 +52,24 @@ class Optimizer:
         best_actions = []
         best_damage = -1
         for move in active.get_move_choices():
-            new_boss = copy.deepcopy(boss)
-            new_team = copy.deepcopy(team)
-            new_active = copy.deepcopy(active)
-            self.update_boss(new_boss, new_team, new_active)
-
-            move_result = new_active.make_move(move)
+            move_result = active.make_move(move)
             if move_result.swap:
                 actions, damage = self.maximize_swap(
-                    turns_remaining, new_boss, new_team, use_boosts=move_result.baton_pass, old_pkmn=new_active)
+                    turns_remaining, boss, team, use_boosts=move_result.baton_pass, old_pkmn=active)
             else:
-                actions, damage = self.maximize_move(turns_remaining, new_boss, new_team, new_active)
+                actions, damage = self.maximize_move(turns_remaining, boss, team, active)
             if move_result.damage + damage > best_damage:
-                best_actions = actions+[f"{new_active} used {move}"]
+                best_actions = actions+[f"{active} used {move}"]
                 best_damage = move_result.damage + damage
+            active.undo_move(move, move_result.undo_info)
+
+            # validate correctness
+            test_memo_key = repr((turns_remaining+1, boss, tuple(team), active))
+            if test_memo_key != memo_key:
+                print(f"MOVE: {move} by {active}")
+                print(test_memo_key)
+                print("----------")
+                print(memo_key)
+                exit()
         self.memo[memo_key] = (best_actions, best_damage)
         return (best_actions, best_damage)
