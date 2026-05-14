@@ -360,7 +360,7 @@ class Shieldon(TeamPokemon):
         elif self._state == 1:
             return ["guard split"]
         else:
-            raise ValueError # shuckle should be dead at this point
+            raise ValueError(f"Unrecognized state {self._state}")
     
     def make_move(self, move):
         if self._state > 1:
@@ -377,7 +377,6 @@ class Shieldon(TeamPokemon):
         if move == "screech":
             res.undo_info["def"] = self.boss.stat_boosts["def"]
             self.boss.change_stat("def", -2)
-            self._state += 1
         elif move == "guard split":
             res.undo_info["self_def"] = self._stats["def"]
             res.undo_info["self_spd"] = self._stats["spd"]
@@ -389,7 +388,6 @@ class Shieldon(TeamPokemon):
             new_spd = (self.boss._stats["spd"] + self._stats["spd"]) / 2
             self.boss._stats["spd"] = new_spd
             self._stats["spd"] = new_spd
-            self._state += 1
         else:
             raise ValueError
         
@@ -449,7 +447,6 @@ class Carbink(TeamPokemon):
         if move == "charm":
             res.undo_info["atk"] = self.boss.stat_boosts["atk"]
             self.boss.change_stat("atk", -2)
-            self._state += 1
         elif move == "guard split":
             res.undo_info["self_def"] = self._stats["def"]
             res.undo_info["self_spd"] = self._stats["spd"]
@@ -461,7 +458,6 @@ class Carbink(TeamPokemon):
             new_spd = (self.boss._stats["spd"] + self._stats["spd"]) / 2
             self.boss._stats["spd"] = new_spd
             self._stats["spd"] = new_spd
-            self._state += 1
         else:
             raise ValueError
         
