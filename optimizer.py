@@ -1,6 +1,8 @@
 from pokemon import *
 import utils
 import copy
+
+VALIDATION_ACTIVE = True
 class Optimizer:
     def __init__(self):
         self.memo = {}
@@ -26,19 +28,31 @@ class Optimizer:
             return ([], 0)
         best_actions = []
         best_damage = -1
+
+        if VALIDATION_ACTIVE:
+            starting_state = repr((boss, tuple(team)))
         for i, _ in enumerate(team):
-            new_boss = copy.deepcopy(boss)
-            new_team = copy.deepcopy(team)
-            self.update_boss(new_boss, new_team)
+            new_team = copy.copy(team)
             swap_target = new_team[i]
             new_team.remove(swap_target)
             if use_boosts:
                 assert(old_pkmn is not None)
-                utils.baton_pass(old_pkmn, swap_target)
-            actions, damage = self.maximize_move(turns_remaining, new_boss, new_team, swap_target)
+                undo = utils.baton_pass(old_pkmn, swap_target)
+            actions, damage = self.maximize_move(turns_remaining, boss, new_team, swap_target)
             if damage > best_damage:
                 best_actions = actions+[f"Swap to {swap_target}"]
                 best_damage = damage
+                
+            if use_boosts:
+                utils.undo_baton_pass(undo) # type: ignore
+            if VALIDATION_ACTIVE:
+                ending_state = repr((boss, tuple(team)))
+                if starting_state != ending_state: # type: ignore
+                    print(starting_state) # type: ignore
+                    print("----------")
+                    print(ending_state)
+                    exit()
+            
         return (best_actions, best_damage)
 
 
@@ -64,12 +78,13 @@ class Optimizer:
             active.undo_move(move, move_result.undo_info)
 
             # validate correctness
-            test_memo_key = repr((turns_remaining+1, boss, tuple(team), active))
-            if test_memo_key != memo_key:
-                print(f"MOVE: {move} by {active}")
-                print(test_memo_key)
-                print("----------")
-                print(memo_key)
-                exit()
+            if VALIDATION_ACTIVE:
+                test_memo_key = repr((turns_remaining+1, boss, tuple(team), active))
+                if test_memo_key != memo_key:
+                    print(f"MOVE: {move} by {active}")
+                    print(memo_key)
+                    print("----------")
+                    print(test_memo_key)
+                    exit()
         self.memo[memo_key] = (best_actions, best_damage)
         return (best_actions, best_damage)
